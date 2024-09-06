@@ -152,5 +152,5 @@ jobs:
       with:
         files: ${{ env.FIRMWARE }}/*
         name: ${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}-${{ env.DEVICE_NAME }}
-        tag_name: ${{ steps.tag.outputs.release_tag }}
+        tag_name: Redmi-AX6000
         body_path: release.txt
