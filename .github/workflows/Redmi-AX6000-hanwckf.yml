@@ -134,19 +134,21 @@ jobs:
         name: ${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}-${{ env.DEVICE_NAME }}
         path: ${{ env.FIRMWARE }}
 
-    - name: 生成release标签
-      id: tag
+
+    - name: 生成 release 描述文件
+      id: prepare_release
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}-${{ env.DEVICE_NAME }}" >> $GITHUB_OUTPUT
-        touch release.txt
-        echo "由衷感谢所有为openwrt无私奉献的大佬们" >> release.txt
-        echo "📥 固件下载" >> release.txt
+        echo "release_tag=Redmi-AX6000" >> $GITHUB_OUTPUT
+        cat <<EOF > release.txt
+        由衷感谢所有为 OpenWRT 无私奉献的大佬们
+        📥 固件下载
+        EOF
         echo "status=success" >> $GITHUB_OUTPUT
-        
-    - name: 发布至release
+    
+    - name: 发布至 GitHub Release
       uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
+      if: steps.prepare_release.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
       with:
@@ -154,18 +156,20 @@ jobs:
         name: ${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}-${{ env.DEVICE_NAME }}
         tag_name: Redmi-AX6000
         body_path: release.txt
-
-    - name: 删除工作流
+    
+    - name: 删除旧的工作流
       uses: Mattraks/delete-workflow-runs@v2
       with:
         retain_days: 30
         keep_minimum_runs: 3
-
-    - name: 移除过去tag
+    
+    - name: 删除旧的 Releases 和 Tags
       uses: dev-drprasad/delete-older-releases@v0.2.1
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 5
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    
