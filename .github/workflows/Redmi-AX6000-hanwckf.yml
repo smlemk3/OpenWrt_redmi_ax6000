@@ -151,8 +151,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
       with:
         files: ${{ env.FIRMWARE }}/*
-        tag_name: Redmi-AX6000
         name: ${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}-${{ env.DEVICE_NAME }} 
+        tag_name: Redmi-AX6000
         body_path: release.txt
     
     - name: 删除旧的工作流
