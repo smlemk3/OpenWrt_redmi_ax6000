@@ -122,8 +122,6 @@ jobs:
       run: | 
         cd openwrt/bin/targets/*/*
         rm -rf packages
-        sudo -E apt-get -qq install rename
-        rename 's/.*${{ env.TARGET_NAME }}/${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}/' *
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
       
@@ -147,13 +145,14 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
     
     - name: 发布至 GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: steps.prepare_release.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
       with:
         files: ${{ env.FIRMWARE }}/*
         tag_name: Redmi-AX6000
+        name: ${{ env.FILE_DATE }}-${{ env.OPENWRT_NAME }}-${{ env.DEVICE_NAME }} 
         body_path: release.txt
     
     - name: 删除旧的工作流
@@ -163,7 +162,7 @@ jobs:
         keep_minimum_runs: 3
     
     - name: 删除旧的 Releases 和 Tags
-      uses: dev-drprasad/delete-older-releases@v0.2.1
+      uses: dev-drprasad/delete-older-releases@v0.3.4
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 5
